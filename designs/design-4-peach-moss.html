@@ -350,9 +350,8 @@ function renderGuests(list) {
     card.querySelector(".guest-name").textContent = String(data[i].nama || "");
     card.querySelector(".guest-greeting").textContent = String(data[i].ucapan || "");
   });
-  $("guestNote").hidden = live; // catatan "contoh" hanya tampil bila data masih contoh
 }
-renderGuests(null);
+renderGuests([]);
 api.wishes().then(w => { if (w && w.length) renderGuests(w); });
 
 function startPetals() {
