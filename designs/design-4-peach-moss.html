@@ -247,7 +247,6 @@ footer .n{font:400 1.6rem var(--script);margin-top:14px}
   <section id="guestlist">
     <h2 class="rv">Ucapan Terbaru</h2>
     <div class="guestlist" id="guestContainer"></div>
-    <p class="guest-note" id="guestNote">Contoh tampilan — daftar ini statis di mockup dan belum tersambung ke form RSVP.</p>
   </section>
 
   <section id="rsvp">
@@ -344,14 +343,8 @@ const WARNA = [
 ];
 $("swatches").innerHTML = WARNA.map(([n, c], i) => `<div class="sw" style="transition-delay:${i * .12}s"><i style="--c:${c}"></i><span>${n}</span></div>`).join("");
 
-const GUEST_SAMPLE = [
-  { nama: "Keluarga Wibowo", ucapan: "Selamat ya Citra dan Dhika, semoga selalu diberi kelancaran sampai hari pernikahan nanti." },
-  { nama: "Rani & Dimas", ucapan: "Turut berbahagia. Sampai jumpa di Bali World Hotel!" },
-  { nama: "Nadia Puspita", ucapan: "Barakallahu lakuma. Semoga menjadi keluarga yang sakinah, mawaddah, warahmah." }
-];
 function renderGuests(list) {
-  const data = (Array.isArray(list) && list.length) ? list : GUEST_SAMPLE;
-  const live = (Array.isArray(list) && list.length) > 0;
+  const data = Array.isArray(list) ? list : [];
   $("guestContainer").innerHTML = data.map(() => `<article class="guest-card"><h3 class="guest-name"></h3><p class="guest-greeting"></p></article>`).join("");
   document.querySelectorAll(".guest-card").forEach((card, i) => {
     card.querySelector(".guest-name").textContent = String(data[i].nama || "");
