@@ -433,48 +433,5 @@ window.addEventListener("scroll", () => {
 });
 </script>
 
-<!-- ============ MOCKUP DESIGN SWITCHER — hapus blok ini untuk versi final ============ -->
-<style>
-
-footer{padding-bottom:132px!important}
-.scroll-top{bottom:74px}
-.sw-wrap{position:fixed;left:0;right:0;bottom:0;z-index:80;display:flex;justify-content:center;padding:0 10px 12px;pointer-events:none;font-family:Jost,system-ui,sans-serif}
-.sw-bar{pointer-events:auto;display:flex;align-items:center;gap:4px;padding:5px 6px;background:rgba(28,24,22,.9);border-radius:999px;box-shadow:0 8px 22px rgba(0,0,0,.32);backdrop-filter:blur(6px)}
-.sw-l{font:400 .6rem/1 Jost,system-ui,sans-serif;letter-spacing:.18em;text-transform:uppercase;color:#e9dfd6;padding:0 4px 0 10px;white-space:nowrap}
-.sw-bar a{display:inline-flex;align-items:center;justify-content:center;min-width:26px;height:26px;padding:0 8px;border-radius:999px;font:400 .72rem/1 Jost,system-ui,sans-serif;color:#f5efe9;text-decoration:none;border:1px solid rgba(255,255,255,.22);white-space:nowrap}
-.sw-bar a:hover,.sw-bar a:focus-visible{background:rgba(255,255,255,.18)}
-.sw-bar a.on{background:#fff;color:#1c1816;border-color:#fff}
-.sw-n{font:400 .66rem/1 Jost,system-ui,sans-serif;color:#d9cbbf;padding:0 6px;text-transform:uppercase;letter-spacing:.1em;white-space:nowrap}
-.sw-bar a.sw-g{border-color:transparent;background:rgba(255,255,255,.1)}
-@media(max-width:600px){.sw-n,.sw-l{display:none}}
-</style>
-<div class="sw-wrap">
-  <nav class="sw-bar" aria-label="Pilih desain undangan">
-    <span class="sw-l">Mockup</span>
-    <a data-sw="1" href="design-1-rose-garden.html">1</a>
-    <a data-sw="2" href="design-2-sky-butter.html">2</a>
-    <a data-sw="3" href="design-3-rose-gold-editorial.html">3</a>
-    <a data-sw="4" href="design-4-peach-moss.html">4</a>
-    <span class="sw-n" id="swName"></span>
-    <a class="sw-g" href="../index.html" title="Kembali ke galeri design">Galeri</a>
-  </nav>
-</div>
-<script>
-(function(){
-  var d=[["design-1-rose-garden.html","1 &middot; Rose Garden"],["design-2-sky-butter.html","2 &middot; Sky &amp; Butter"],["design-3-rose-gold-editorial.html","3 &middot; Rose Gold Editorial"],["design-4-peach-moss.html","4 &middot; Peach &amp; Moss"]];
-  var cur=location.pathname.split("/").pop()||"",i=-1;
-  for(var k=0;k<d.length;k++){if(d[k][0]===cur){i=k;}}
-  var nm=document.getElementById("swName"); if(nm&&i>-1){nm.innerHTML=d[i][1];}
-  var ls=document.querySelectorAll("[data-sw]");
-  for(var j=0;j<ls.length;j++){if(i>-1&&ls[j].getAttribute("data-sw")===String(i+1)){ls[j].className="on";}}
-  document.addEventListener("keydown",function(e){
-    var t=(e.target.tagName||"").toUpperCase();
-    if(t==="INPUT"||t==="SELECT"||t==="TEXTAREA"||e.metaKey||e.ctrlKey||e.altKey){return;}
-    if(e.key>="1"&&e.key<="4"){var p=d[+e.key-1]; if(p){location.href=p[0];}}
-    if((e.key||"").toLowerCase()==="g"){location.href="../index.html";}
-  });
-})();
-</script>
-<!-- ============ /MOCKUP DESIGN SWITCHER ============ -->
 </body>
 </html>
