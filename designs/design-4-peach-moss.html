@@ -247,7 +247,7 @@ footer .n{font:400 1.6rem var(--script);margin-top:14px}
   <section id="guestlist">
     <h2 class="rv">Ucapan Terbaru</h2>
     <div class="guestlist" id="guestContainer"></div>
-    <p class="guest-note">Contoh tampilan — daftar ini statis di mockup dan belum tersambung ke form RSVP.</p>
+    <p class="guest-note" id="guestNote">Contoh tampilan — daftar ini statis di mockup dan belum tersambung ke form RSVP.</p>
   </section>
 
   <section id="rsvp">
@@ -264,7 +264,7 @@ footer .n{font:400 1.6rem var(--script);margin-top:14px}
       <p class="err" id="err" role="alert"></p>
       <button class="btn" type="submit" id="rsvpBtn"><span class="btn-txt">Kirim</span></button>
     </form>
-    <p class="mock-note">Mode mockup: tombol kirim belum mengirim data ke server. Nomor WA dan endpoint RSVP masih perlu diisi saat undangan dipakai.</p>
+    <p class="mock-note" id="mockNote">Mode mockup: tombol kirim belum mengirim data ke server. Endpoint RSVP (Google Sheets) masih perlu diisi saat undangan dipakai — lihat README.</p>
     <div class="done" id="rsvpDone" hidden>
       <svg class="check" viewBox="0 0 52 52" aria-hidden="true">
         <circle class="check-c" cx="26" cy="26" r="24"/>
@@ -287,6 +287,31 @@ footer .n{font:400 1.6rem var(--script);margin-top:14px}
 <script>
 const EVENT = new Date("2026-12-26T13:30:00+07:00");
 const $ = id => document.getElementById(id);
+
+/* ==== KONEKSI GOOGLE SHEETS =========================================
+   Isi RSVP_ENDPOINT dengan URL /exec hasil "Deploy web app" dari
+   sheet RSVP (script di folder sheets/Code.gs). Kosong = mode mockup:
+   form tidak mengirim data dan daftar ucapan memakai contoh. */
+const CONFIG = { RSVP_ENDPOINT: "" };
+
+const api = {
+  post(payload) {
+    if (!CONFIG.RSVP_ENDPOINT) return Promise.reject(new Error("mock"));
+    return fetch(CONFIG.RSVP_ENDPOINT, {
+      method: "POST",
+      headers: { "Content-Type": "text/plain;charset=utf-8" }, // hindari preflight CORS
+      body: JSON.stringify(payload)
+    }).then(r => { if (!r.ok) throw new Error("HTTP " + r.status); return r.json().catch(() => ({})); });
+  },
+  wishes() {
+    if (!CONFIG.RSVP_ENDPOINT) return Promise.resolve(null);
+    return fetch(CONFIG.RSVP_ENDPOINT + "?action=wishes")
+      .then(r => (r.ok ? r.json() : null))
+      .then(d => (d && Array.isArray(d.wishes) ? d.wishes : null))
+      .catch(() => null);
+  }
+};
+$("mockNote").hidden = !!CONFIG.RSVP_ENDPOINT;
 
 const to = new URLSearchParams(location.search).get("to");
 if (to) { $("namaTamu").textContent = to; $("tamu").hidden = false; }
@@ -323,11 +348,18 @@ const GUEST_SAMPLE = [
   { nama: "Rani & Dimas", ucapan: "Turut berbahagia. Sampai jumpa di Bali World Hotel!" },
   { nama: "Nadia Puspita", ucapan: "Barakallahu lakuma. Semoga menjadi keluarga yang sakinah, mawaddah, warahmah." }
 ];
-$("guestContainer").innerHTML = GUEST_SAMPLE.map(g => `<article class="guest-card"><h3 class="guest-name"></h3><p class="guest-greeting"></p></article>`).join("");
-document.querySelectorAll(".guest-card").forEach((card, i) => {
-  card.querySelector(".guest-name").textContent = GUEST_SAMPLE[i].nama;
-  card.querySelector(".guest-greeting").textContent = GUEST_SAMPLE[i].ucapan;
-});
+function renderGuests(list) {
+  const data = (Array.isArray(list) && list.length) ? list : GUEST_SAMPLE;
+  const live = (Array.isArray(list) && list.length) > 0;
+  $("guestContainer").innerHTML = data.map(() => `<article class="guest-card"><h3 class="guest-name"></h3><p class="guest-greeting"></p></article>`).join("");
+  document.querySelectorAll(".guest-card").forEach((card, i) => {
+    card.querySelector(".guest-name").textContent = String(data[i].nama || "");
+    card.querySelector(".guest-greeting").textContent = String(data[i].ucapan || "");
+  });
+  $("guestNote").hidden = live; // catatan "contoh" hanya tampil bila data masih contoh
+}
+renderGuests(null);
+api.wishes().then(w => { if (w && w.length) renderGuests(w); });
 
 function startPetals() {
   const box = $("petals"), cols = ["#F2B5A7","#F8D8C0","#f4c3b4"];
@@ -363,15 +395,30 @@ $("rsvpForm").addEventListener("submit", e => {
   if (!nama) { $("err").textContent = "Nama wajib diisi."; $("nama").focus(); return; }
   $("err").textContent = "";
   const btn = $("rsvpBtn");
+  const payload = {
+    nama,
+    status: $("status").value,
+    jumlah: Number($("jumlah").value) || 1,
+    hp: $("hp").value.trim(),
+    ucapan: $("ucapan").value.trim()
+  };
   btn.classList.add("loading");
-  setTimeout(() => {
+  const finish = msg => {
     btn.classList.remove("loading");
     $("rsvpForm").reset();
-    $("doneMsg").textContent = "Konfirmasi Anda telah tersimpan. Kami tunggu kehadiran Bapak/Ibu!";
+    $("doneMsg").textContent = msg;
     $("rsvpForm").classList.add("done-hide");
     $("rsvpDone").hidden = false;
     $("rsvpDone").scrollIntoView({ behavior: "smooth", block: "center" });
-  }, 700);
+    if (payload.ucapan) api.wishes().then(w => { if (w && w.length) renderGuests(w); });
+  };
+  api.post(payload)
+    .then(() => finish("Konfirmasi Anda telah tersimpan. Kami tunggu kehadiran Bapak/Ibu!"))
+    .catch(err => {
+      if (err && err.message === "mock") { setTimeout(() => finish("Konfirmasi Anda telah tersimpan. Kami tunggu kehadiran Bapak/Ibu!"), 700); return; }
+      btn.classList.remove("loading");
+      $("err").textContent = "Gagal mengirim. Periksa koneksi internet lalu coba lagi.";
+    });
 });
 
 $("rsvpAgain").addEventListener("click", () => {

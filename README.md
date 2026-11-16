@@ -12,6 +12,7 @@ designs/
   design-2-sky-butter.html              → modern pastel blob, nama besar, marquee
   design-3-rose-gold-editorial.html     → editorial Bodoni, angka 01–04, minimal
   design-4-peach-moss.html              → botani klasik, monogram C&D, paling lengkap
+sheets/Code.gs                          → Apps Script: simpan RSVP ke Sheets + feed ucapan
 preview/                                → screenshot tiap bagian (desktop + mobile)
 reference/base-design-adhit-rahmah.html → design asal sebagai referensi (bukan bagian mockup)
 ```
@@ -41,16 +42,38 @@ reference/base-design-adhit-rahmah.html → design asal sebagai referensi (bukan
 - **Nomor WhatsApp RSVP belum diisi.** Design 1–3 memakai tombol "Kirim via WhatsApp"
   (`const RSVP_WA=""` di dalam `<script>`); selama kosong, form menampilkan pesan
   "Nomor WhatsApp RSVP belum diatur."
-- **Design 4** memakai form dengan panel "Terima kasih" — masih simulasi, belum tersambung
-  ke Google Sheets/Apps Script. Kartu "Ucapan Terbaru" juga masih contoh statis.
+- **Design 4** sudah punya kode sambungan RSVP → Google Sheets (`CONFIG.RSVP_ENDPOINT`
+  di awal `<script>`), tapi **endpoint-nya masih kosong**, jadi sekarang masih mode mockup:
+  form tidak mengirim data dan "Ucapan Terbaru" menampilkan contoh. Isi endpoint = langsung
+  hidup (langkah di bawah).
 - **Monogram** design 4 masih SVG sementara.
 - **Font** diambil dari Google Fonts (butuh internet).
+
+## Sambungkan RSVP design 4 ke Google Sheets
+
+1. Buat Google Sheets baru, beri nama tab-nya `RSVP`.
+2. **Extensions > Apps Script**, hapus isi `Code.gs`, tempel isi `sheets/Code.gs` dari repo ini.
+3. **Deploy > New deployment > Web app**:
+   - Execute as: **Me**
+   - Who has access: **Anyone**
+   Salin URL yang berakhiran `/exec`.
+4. Buka `designs/design-4-peach-moss.html`, isi baris:
+   `const CONFIG = { RSVP_ENDPOINT: "https://script.google.com/macros/s/XXXX/exec" };`
+5. Simpan, buka halaman, kirim satu RSVP uji coba — baris baru harus muncul di sheet,
+   dan ucapan yang diisi harus muncul di bagian "Ucapan Terbaru".
+
+Yang dikirim: waktu, nama, konfirmasi, jumlah tamu, nomor HP, ucapan.
+Yang dipublikasikan di halaman: **hanya nama + ucapan** (HP dan jumlah tamu tidak pernah
+dikirim ke browser, sesuai kebijakan tampilan publik).
+
+Catatan: Apps Script butuh 1–2 menit untuk menyelesaikan deployment pertama; kalau halaman
+menampilkan "Gagal mengirim", tunggu sebentar lalu coba lagi.
 
 ## Kalau satu design sudah dipilih (langkah produksi)
 
 1. Salin file design terpilih menjadi satu halaman tersendiri (tanpa folder `designs/`).
 2. Hapus blok `<!-- ===== MOCKUP DESIGN SWITCHER ===== --> ... <!-- /MOCKUP DESIGN SWITCHER -->`
    yang ada tepat sebelum `</body>` (berisi style bar, HTML bar, dan script-nya).
-3. Isi `RSVP_WA` dengan nomor WhatsApp (format `62...`, tanpa `+`/`0`), atau sambungkan
-   form ke Google Sheets.
+3. Isi `RSVP_WA` dengan nomor WhatsApp (format `62...`, tanpa `+`/`0`), atau — untuk
+   design 4 — isi `CONFIG.RSVP_ENDPOINT` sesuai bagian "Sambungkan RSVP" di atas.
 4. Ganti monogram/foto dengan aset dari klien bila sudah tersedia.
