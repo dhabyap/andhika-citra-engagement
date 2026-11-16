@@ -119,13 +119,7 @@ h2{font:400 2.4rem/1.15 var(--display);color:var(--moss);margin-bottom:18px;lett
 .count span{font-size:.62rem;letter-spacing:.18em;text-transform:uppercase;color:var(--soft)}
 @keyframes bump{40%{transform:translateY(-6px);opacity:.3}}
 .dc-title{font:400 1.5rem var(--display);letter-spacing:.1em;text-transform:uppercase;color:var(--text);margin-top:26px}
-.swatches{display:flex;flex-wrap:wrap;justify-content:center;gap:22px 6px;margin:22px 0 4px}
-.sw{flex:0 0 calc(33.333% - 5px);min-width:0;display:flex;flex-direction:column;align-items:center;gap:8px;opacity:0;transform:scale(.4) rotate(-40deg);transition:opacity .7s,transform .9s cubic-bezier(.3,1.5,.5,1)}
-.swatches.in .sw{opacity:1;transform:none}
-.sw i{display:block;width:56px;height:56px;background:var(--c);filter:drop-shadow(0 2px 3px rgba(74,64,54,.25));transition:transform .5s}
-.sw i{clip-path:var(--scallop)}
-.sw:hover i{transform:rotate(30deg) scale(1.12)}
-.sw span{font:400 .78rem var(--display);letter-spacing:.08em;text-transform:uppercase;color:var(--text)}
+.dc-desc{font-size:.85rem;color:var(--soft);line-height:1.7}
 form{text-align:left;margin-top:22px}
 label{display:block;font-size:.8rem;color:var(--moss);margin:16px 0 4px}
 input,select,textarea{width:100%;padding:11px 12px;background:#fff9;border:1px solid var(--gold);font:300 .95rem var(--body);color:var(--text);border-radius:0;transition:box-shadow .3s}
@@ -240,8 +234,7 @@ footer .n{font:400 1.6rem var(--script);margin-top:14px}
 
   <section class="pink" id="dresscode">
     <h2 class="rv">Dresscode</h2>
-    <p class="dc-title rv d1">Nuansa Pastel</p>
-    <div class="swatches" id="swatches"></div>
+    <p class="dc-desc rv d1">Pakaian batik atau formal nuansa pastel (broken white, ivory, soft yellow, soft blue, soft purple, dusty pink). Tidak ada dresscode khusus keluarga/teman.</p>
   </section>
 
   <section id="guestlist">
@@ -333,16 +326,6 @@ document.querySelectorAll(".corner").forEach(c => c.innerHTML = corner);
 
 const pts = []; for (let k = 0; k < 96; k++) { const t = k / 96 * 2 * Math.PI, r = 48 + 2.6 * Math.cos(t * 20); pts.push(`${(50 + r * Math.cos(t)).toFixed(1)}% ${(50 + r * Math.sin(t)).toFixed(1)}%`); }
 document.documentElement.style.setProperty("--scallop", `polygon(${pts.join(",")})`);
-const WARNA = [
-  ["Broken White","#FDFBF7"],
-  ["Ivory","#F0E4C8"],
-  ["Soft Yellow","#EBD98C"],
-  ["Soft Blue","#C9D1DA"],
-  ["Soft Purple","#D2C8DC"],
-  ["Dusty Pink","#EBB6C2"]
-];
-$("swatches").innerHTML = WARNA.map(([n, c], i) => `<div class="sw" style="transition-delay:${i * .12}s"><i style="--c:${c}"></i><span>${n}</span></div>`).join("");
-
 const GUEST_SAMPLE = [
   { nama: "Keluarga Wibowo", ucapan: "Selamat ya Citra dan Dhika, semoga selalu diberi kelancaran sampai hari pernikahan nanti." },
   { nama: "Rani & Dimas", ucapan: "Turut berbahagia. Sampai jumpa di Bali World Hotel!" },
@@ -378,7 +361,7 @@ $("open").addEventListener("click", () => {
 });
 
 const io = new IntersectionObserver(es => es.forEach(e => { if (e.isIntersecting) { e.target.classList.add("in"); io.unobserve(e.target); } }), { threshold: .2 });
-document.querySelectorAll(".rv,.rule,.swatches").forEach(el => io.observe(el));
+document.querySelectorAll(".rv,.rule").forEach(el => io.observe(el));
 
 function setN(id, v) { const e = $(id); if (e.textContent != v) { e.textContent = v; e.classList.remove("bump"); void e.offsetWidth; e.classList.add("bump"); } }
 function tick() {
