@@ -170,9 +170,21 @@ footer .n{font:400 1.6rem var(--script);margin-top:14px}
 .mock-note{margin-top:14px;padding:10px 12px;background:rgba(201,162,75,.12);border:1px dashed rgba(201,162,75,.6);font-size:.72rem;color:#6a5f52;text-align:left;line-height:1.5}
 #guestlist{padding-top:60px;padding-bottom:60px}
 @media(max-width:480px){.guest-card{padding:14px 15px}}
+/* Music toggle */
+.music-btn{position:fixed;bottom:24px;left:24px;z-index:30;width:44px;height:44px;border-radius:50%;background:var(--moss);color:var(--ivory);display:flex;align-items:center;justify-content:center;cursor:pointer;box-shadow:0 2px 8px rgba(0,0,0,.2);transition:transform .3s,background .3s}
+.music-btn:hover{transform:scale(1.1);background:#5a6640}
+.music-btn.playing svg{animation:spin 3s linear infinite}
+@keyframes spin{to{transform:rotate(360deg)}}
 </style>
 </head>
 <body class="locked">
+
+<audio id="bgMusic" src="../assets/music.mp3" loop preload="auto"></audio>
+<div id="musicBtn" class="music-btn" aria-label="Toggle music" title="Musik">
+  <svg viewBox="0 0 24 24" width="20" height="20" fill="currentColor">
+    <path d="M12 3v10.55c-.59-.34-1.27-.55-2-.55-2.21 0-4 1.79-4 4s1.79 4 4 4 4-1.79 4-4V7h4V3h-6z"/>
+  </svg>
+</div>
 
 <div id="cover">
   <div class="half l"></div><div class="half r"></div>
@@ -368,6 +380,21 @@ $("open").addEventListener("click", () => {
   $("cover").classList.add("opening");
   setTimeout(() => $("hero").classList.add("go"), 700);
   setTimeout(() => { $("cover").remove(); document.body.classList.remove("locked"); startPetals(); }, 1600);
+  // Start music
+  const music = $("bgMusic");
+  music.volume = 0.5;
+  music.play().then(() => $("musicBtn").classList.add("playing")).catch(() => {});
+});
+
+$("musicBtn").addEventListener("click", () => {
+  const music = $("bgMusic");
+  const btn = $("musicBtn");
+  if (music.paused) {
+    music.play().then(() => btn.classList.add("playing")).catch(() => {});
+  } else {
+    music.pause();
+    btn.classList.remove("playing");
+  }
 });
 
 const io = new IntersectionObserver(es => es.forEach(e => { if (e.isIntersecting) { e.target.classList.add("in"); io.unobserve(e.target); } }), { threshold: .2 });
